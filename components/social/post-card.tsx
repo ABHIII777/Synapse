@@ -79,6 +79,42 @@ export function PostCard({ post, isProfileView }: PostProps) {
     const maxLength = 200;
     const router = useRouter();
 
+    const renderContentWithLinks = (content: string) => {
+        if (!content) return "";
+        const parts = content.split(/([#@]\w+)/g);
+        return parts.map((part, index) => {
+            if (part.startsWith("#")) {
+                return (
+                    <span
+                        key={index}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/explore?search=${encodeURIComponent(part)}`);
+                        }}
+                        className="text-primary hover:underline cursor-pointer font-medium"
+                    >
+                        {part}
+                    </span>
+                );
+            } else if (part.startsWith("@")) {
+                const username = part.substring(1);
+                return (
+                    <span
+                        key={index}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/profile/${encodeURIComponent(username)}`);
+                        }}
+                        className="text-primary hover:underline cursor-pointer font-medium"
+                    >
+                        {part}
+                    </span>
+                );
+            }
+            return part;
+        });
+    };
+
     const handleLikes = async () => {
         if (!userId) return
         const newIsLiked = !isLiked;
@@ -310,7 +346,7 @@ export function PostCard({ post, isProfileView }: PostProps) {
 
                     {/* Text Content */}
                     <p className="text-[15px] text-foreground whitespace-pre-wrap leading-normal mb-3">
-                        {post.content}
+                        {renderContentWithLinks(post.content)}
                     </p>
 
                     {/* Media Placeholder */}
