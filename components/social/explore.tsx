@@ -85,6 +85,13 @@ export function ExploreComponent() {
   }, [])
 
   useEffect(() => {
+    fetch("/api/user/me")
+      .then((res) => res.json())
+      .then((data) => setCurrentUser(data))
+      .catch((err) => console.error("Failed to fetch current user.", err))
+  }, [])
+
+  useEffect(() => {
     if (!currentUser || initialPeople.length === 0) return
 
     initialPeople.forEach((person) => {
@@ -103,12 +110,21 @@ export function ExploreComponent() {
   }, [currentUser, initialPeople])
 
   const handleFollowToggle = async (targetUserId: number) => {
+    console.log("Follow Button Clicked")
+
     if (!currentUser) return; 
+
+    console.log(currentUser.id, targetUserId)
+
     const nextState = !followedState[targetUserId];
+
     setFollowedState((prev) => ({
       ...prev,
       [targetUserId]: nextState,
     }));
+
+    console.log(followedState)
+
     try {
       const response = await fetch("/api/follow-following", {
         method: "POST",
@@ -121,6 +137,9 @@ export function ExploreComponent() {
           action: nextState ? "follow" : "unfollow",
         }),
       });
+
+      console.log(response)
+
       if (!response.ok) {
         setFollowedState((prev) => ({
           ...prev,
@@ -128,7 +147,9 @@ export function ExploreComponent() {
         }));
       }
     } catch (err) {
+
       console.error("Follow action failed:", err);
+
       setFollowedState((prev) => ({
         ...prev,
         [targetUserId]: !nextState,
@@ -225,7 +246,7 @@ export function ExploreComponent() {
           {/* Posts Tab Content */}
           <TabsContent value="posts" className="mt-6 focus-visible:ring-0 focus-visible:ring-offset-0">
             <div className="space-y-4">
-              {filteredPeople.map((post) => (
+              {filteredPosts.map((post) => (
                 <PostCard key={post.id} post={post} isProfileView={false} />
               ))}
               {filteredPosts.length === 0 && (
