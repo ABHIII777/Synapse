@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -67,6 +68,8 @@ export function ExploreComponent() {
 
   const [isFollowing, setIsFollowing] = useState<boolean>(false)
   const [followedState, setFollowedState] = useState<Record<number, boolean>>({})
+
+  const router = useRouter();
 
   useEffect(() => {
     fetch("/api/feed")
@@ -264,6 +267,11 @@ export function ExploreComponent() {
                   <div
                     key={person.id}
                     className="p-5 rounded-2xl border border-border/40 bg-card hover:border-border hover:bg-secondary/10 transition-all duration-200 flex flex-col justify-between gap-4 group"
+                    onClick={() => {
+                      if (person.name) {
+                        router.push(`/profile/${encodeURIComponent(person.name)}`)
+                      }
+                    }}
                   >
                     <div className="flex items-start gap-4">
                       <Avatar className="h-12 w-12 border border-border">
